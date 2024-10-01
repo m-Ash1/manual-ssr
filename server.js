@@ -63,18 +63,30 @@ function MenuItem({ pizza }) {
   );
 }
 
+// * Read the HTML and client template
 const htmlTemplate = readFileSync(`${__dirname}/index.html`, "utf-8");
+const client = readFileSync(`${__dirname}/client.js`, "utf-8");
+
 const server = createServer((req, res) => {
+  // * Parse the URL
   const pathName = parse(req.url, true).pathname;
   if (pathName === "/") {
+    // * Render the Home component to a string - getting react in again
     const app = renderToString(<Home />);
+
+    // * Replace the placeholder with the rendered app - root div
     const html = htmlTemplate.replace("%%%CONTENT%%%", app);
     res.writeHead(200, {
       "Content-Type": "text/html",
     });
+
+    // * Send the response
     res.end(html);
-  } else if (pathName === "/about") {
-    res.end("About Us");
+  } else if (pathName === "/client.js") {
+    res.writeHead(200, {
+      "Content-Type": "application/javascript",
+    });
+    res.end(client);
   } else {
     res.end("this page is not found");
   }
